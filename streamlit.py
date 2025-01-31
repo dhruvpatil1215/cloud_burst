@@ -20,72 +20,81 @@ st.set_page_config(page_title="Cloudburst Prediction", page_icon="⛅", layout="
 # Custom dark theme styling
 st.markdown("""
     <style>
+        /* Main App Background */
         .stApp {
-         background: linear-gradient(135deg, #0a2e84, #0d5d93,#3ff2ff);
-            color: #ecf0f1;
+            background: linear-gradient(135deg, #0B0C10, #1F2833, #45A29E);
+            color: #C5C6C7;
             font-family: 'Poppins', sans-serif;
         }
 
+        /* Sidebar */
         .sidebar .sidebar-content {
-            background: #34495E;
+            background: #222831;
             color: white;
             padding: 20px;
             border-radius: 10px;
         }
 
         .sidebar h2 {
-            color: #1abc9c;
+            color: #66FCF1;
             font-size: 22px;
             font-weight: 600;
             text-align: center;
+            text-shadow: 0px 0px 10px rgba(102, 252, 241, 0.8);
         }
 
+        /* Buttons */
         .stButton>button {
-            background-color: #16a085;
-            color: white;
+            background: linear-gradient(90deg, #45A29E, #66FCF1);
+            color: black;
             font-size: 18px;
             font-weight: bold;
             border-radius: 20px;
             border: none;
             padding: 12px 24px;
-            box-shadow: 0px 8px 15px rgba(0, 188, 212, 0.3);
+            box-shadow: 0px 8px 20px rgba(102, 252, 241, 0.3);
             transition: all 0.3s ease;
             cursor: pointer;
         }
 
         .stButton>button:hover {
-            background-color: #1abc9c;
+            background: linear-gradient(90deg, #66FCF1, #45A29E);
             transform: scale(1.05);
+            box-shadow: 0px 12px 25px rgba(102, 252, 241, 0.5);
         }
 
+        /* Sliders */
         .stSlider>div>div>div>input {
-            background-color: #2c3e50;
-            color: white;
+            background-color: #393E46;
+            color: #66FCF1;
         }
 
+        /* Input Boxes */
         .stTextInput>div>div>input {
-            background-color: #2c3e50;
-            color: white;
+            background-color: #393E46;
+            color: #66FCF1;
             border-radius: 12px;
             padding: 10px;
             font-size: 16px;
         }
 
+        /* Metrics Box */
         .stMetric {
             background-color: rgba(255, 255, 255, 0.1);
             border-radius: 15px;
             padding: 30px;
             font-size: 30px;
             font-weight: 600;
-            color: #1abc9c;
-            box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+            color: #66FCF1;
+            box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2);
         }
 
+        /* Footer */
         footer {
             text-align: center;
             padding: 20px;
             background-color: rgba(0, 0, 0, 0.7);
-            color: #ffffff;
+            color: #C5C6C7;
             font-size: 14px;
             border-radius: 10px;
         }
@@ -95,12 +104,14 @@ st.markdown("""
         }
 
         footer a {
-            color: #1abc9c;
+            color: #66FCF1;
             text-decoration: none;
             font-weight: bold;
+            text-shadow: 0px 0px 5px rgba(102, 252, 241, 0.7);
         }
     </style>
 """, unsafe_allow_html=True)
+
 
 @st.cache_data
 def load_data():
@@ -176,21 +187,27 @@ if page == "Home":
     st.progress(int(probability_result * 100))
 elif page == "5-Day Weather Data":
     st.subheader("🌤 5-Day Weather Forecast (3-hour intervals)")
+
+    # Input field for city
     city = st.text_input("Enter City:", "London")
+
+    # API key for OpenWeatherMap
     api_key = "673c79d4cf4ef8aa981ebd075e6c3eb1"  # Replace with your OpenWeatherMap API key
+
+    # Fetch weather data
     weather_data = fetch_weather_data(city, api_key)
 
     # Radio button for mode selection
     mode = st.radio(
-        "Select Mode",
-        ("Show Weather Data", "Show Weather Graph", "AP"),
+        "Select Mode 🌈",
+        ("Show Weather Data 📊", "Show Weather Graph 📈", "Interactive Map 🌍"),
         horizontal=True
     )
 
     if weather_data:
-        st.write(f"**City:** {weather_data['city']['name']}, {weather_data['city']['country']}")
+        st.write(f"**City:** {weather_data['city']['name']} 🌆, {weather_data['city']['country']} 🌍")
         forecasts = weather_data['list']
-        
+
         # Create an empty list to store weather data for the next 5 days (3-hour intervals)
         weather_list = []
 
@@ -206,18 +223,19 @@ elif page == "5-Day Weather Data":
             gust = forecast.get('wind', {}).get('gust', 'N/A')
             pressure = forecast['main']['pressure']
             cloud_cover = forecast['clouds']['all']
-            
+            humidity = forecast['main']['humidity']  # Extract humidity
+
             # Append data to the list
-            weather_list.append([dt_txt, temp, desc.capitalize(), rain, snow, wind_speed, gust, wind_deg, pressure, cloud_cover])
+            weather_list.append([dt_txt, temp, desc.capitalize(), rain, snow, wind_speed, gust, wind_deg, pressure, cloud_cover, humidity])
 
         # Create a DataFrame from the weather data
-        df_weather = pd.DataFrame(weather_list, columns=["Date/Time", "Temperature (°C)", "Description", "Rain (mm)", "Snow (mm)", "Wind Speed (m/s)", "Wind Gust (m/s)", "Wind Direction (°)", "Pressure (hPa)", "Cloud Cover (%)"])
+        df_weather = pd.DataFrame(weather_list, columns=["Date/Time", "Temperature (°C)", "Description", "Rain (mm)", "Snow (mm)", "Wind Speed (m/s)", "Wind Gust (m/s)", "Wind Direction (°)", "Pressure (hPa)", "Cloud Cover (%)", "Humidity (%)"])
 
-        if mode == "Show Weather Data":
+        if mode == "Show Weather Data 📊":
             # Show weather data for 5 days (3-hour intervals)
             st.dataframe(df_weather)
 
-        elif mode == "Show Weather Graph":
+        elif mode == "Show Weather Graph 📈":
             # Initialize the graph
             fig = go.Figure()
 
@@ -226,9 +244,21 @@ elif page == "5-Day Weather Data":
                 go.Scatter(
                     x=df_weather["Date/Time"],
                     y=df_weather["Temperature (°C)"],
-                    name="Temperature (°C)",
+                    name="Temperature (°C) 🌡️",
                     mode="lines+markers",
                     line=dict(color="red")
+                )
+            )
+
+            # Plot humidity after temperature
+            fig.add_trace(
+                go.Scatter(
+                    x=df_weather["Date/Time"],
+                    y=df_weather["Humidity (%)"],
+                    name="Humidity (%) 💧",
+                    mode="lines+markers",
+                    line=dict(color="green"),
+                    yaxis="y2"  # Humidity uses secondary Y-axis
                 )
             )
 
@@ -237,29 +267,37 @@ elif page == "5-Day Weather Data":
                 go.Scatter(
                     x=df_weather["Date/Time"],
                     y=df_weather["Rain (mm)"],  # Can plot other variables like rain/snow if needed
-                    name="Rain (mm)",
+                    name="Rain (mm) 🌧️",
                     mode="lines+markers",
                     line=dict(color="blue"),
-                    yaxis="y2"
+                    yaxis="y3"
                 )
             )
 
             # Update layout for dual axes
             fig.update_layout(
                 yaxis=dict(
-                    title="Temperature (°C)",
+                    title="Temperature (°C) 🌡️",
                     titlefont=dict(color="red"),
                     tickfont=dict(color="red")
                 ),
                 yaxis2=dict(
-                    title="Rain (mm)",
+                    title="Humidity (%) 💧",
+                    titlefont=dict(color="green"),
+                    tickfont=dict(color="green"),
+                    overlaying="y",
+                    side="right",
+                    position=0.85  # Adjust position to avoid overlap
+                ),
+                yaxis3=dict(
+                    title="Rain (mm) 🌧️",
                     titlefont=dict(color="blue"),
                     tickfont=dict(color="blue"),
                     overlaying="y",
                     side="right"
                 ),
-                title="Temperature and Rain Forecast",
-                xaxis=dict(title="Date & Time"),
+                title="Weather Forecast 📅",
+                xaxis=dict(title="Date & Time 🕒"),
                 xaxis_tickangle=-45,  # Rotate x-axis labels
                 title_x=0.5
             )
@@ -267,9 +305,9 @@ elif page == "5-Day Weather Data":
             # Display the graph
             st.plotly_chart(fig)
 
-        elif mode == "AP":
+        elif mode == "Interactive Map 🌍":
             # Display the interactive weather map
-            st.write("**Interactive Weather Map**")
+            st.write("**Interactive Weather Map 🌎**")
             st.markdown(
                 """
                 <iframe src="https://openweathermap.org/weathermap?basemap=map&cities=false&layer=temperature&lat=19.4342&lon=72.7718&zoom=5"
@@ -277,7 +315,6 @@ elif page == "5-Day Weather Data":
                 """,
                 unsafe_allow_html=True,
             )
-
 elif page == "Wind Rose Chart":
     st.subheader("🌀 Wind Rose Chart")
     st.write("Visualizing wind speeds and directions.")
@@ -458,6 +495,3 @@ elif page == "Model Comparison":
         comparison_results.append({'Model': model_name, 'Accuracy': f"{accuracy_model:.2%}"})
 
     st.table(pd.DataFrame(comparison_results))
-
-
-    

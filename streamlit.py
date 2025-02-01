@@ -246,22 +246,33 @@ elif mode == "Show Weather Graph 📈":
         st.error("⚠️ No data available for graph.")
     else:
         # Create a subplot with secondary y-axis
-        fig = make_subplots(
-            rows=1, cols=1,
-            subplot_titles=["Weather Data Graph"],
-            shared_xaxes=True
-        )
+        fig = make_subplots(specs=[[{"secondary_y": True}]])
 
-        # Add weather data graph (this part can be customized based on the required graph)
+        # Plot temperature
         fig.add_trace(
-            go.Scatter(x=df_weather["Date/Time"], y=df_weather["Temperature (°C)"], mode="lines+markers", name="Temperature (°C)"),
-            row=1, col=1
+            go.Scatter(x=df_weather["Date/Time"], y=df_weather["Temperature (°C)"],
+                       mode="lines", name="Temperature", line=dict(color="orange")),
+            secondary_y=False,
         )
 
-        fig.update_layout(title="Temperature Over 5 Days", xaxis_title="Date/Time", yaxis_title="Temperature (°C)")
+        # Plot cloud cover
+        fig.add_trace(
+            go.Scatter(x=df_weather["Date/Time"], y=df_weather["Cloud Cover (%)"],
+                       mode="lines", name="Cloud Cover", line=dict(color="blue")),
+            secondary_y=True,
+        )
 
+        # Set axis labels
+        fig.update_layout(
+            title_text="5-Day Weather Forecast",
+            xaxis_title="Date/Time",
+            yaxis_title="Temperature (°C)",
+            yaxis2_title="Cloud Cover (%)",
+            xaxis=dict(tickmode="linear", tick0=0, dtick=1),  # Adjust the x-axis ticks
+        )
+
+        # Show the figure
         st.plotly_chart(fig)
-
 elif mode == "Interactive Map 🌍":
             st.write("**Interactive Weather Map 🌎**")
             st.markdown(

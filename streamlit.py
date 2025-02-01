@@ -204,117 +204,122 @@ elif page == "5-Day Weather Data":
         horizontal=True
     )
 
-    if weather_data:
+    if weather_data and "list" in weather_data and "city" in weather_data:
         st.write(f"**City:** {weather_data['city']['name']} 🌆, {weather_data['city']['country']} 🌍")
-        forecasts = weather_data['list']
+        forecasts = weather_data["list"]
 
-        # Create an empty list to store weather data for the next 5 days (3-hour intervals)
+        # Store weather data for 5 days (3-hour intervals)
         weather_list = []
 
-        # Loop through the forecasts, fetch data at 3-hour intervals for the next 5 days
         for forecast in forecasts:
-            dt_txt = forecast['dt_txt']
-            temp = forecast['main']['temp']
-            desc = forecast['weather'][0]['description']
-            rain = forecast.get('rain', {}).get('3h', 0)  # Rain volume in mm
-            snow = forecast.get('snow', {}).get('3h', 0)  # Snow volume in mm
-            wind_speed = forecast['wind']['speed']
-            wind_deg = forecast['wind']['deg']
-            gust = forecast.get('wind', {}).get('gust', 'N/A')
-            pressure = forecast['main']['pressure']
-            cloud_cover = forecast['clouds']['all']
-            humidity = forecast['main']['humidity']  # Extract humidity
+            dt_txt = forecast["dt_txt"]
+            temp = forecast["main"]["temp"]
+            desc = forecast["weather"][0]["description"].capitalize()
+            rain = forecast.get("rain", {}).get("3h", 0)
+            snow = forecast.get("snow", {}).get("3h", 0)
+            wind_speed = forecast["wind"]["speed"]
+            gust = forecast["wind"].get("gust", "N/A")
+            wind_deg = forecast["wind"]["deg"]
+            pressure = forecast["main"]["pressure"]
+            cloud_cover = forecast["clouds"]["all"]
+            humidity = forecast["main"]["humidity"]
 
-            # Append data to the list
-            weather_list.append([dt_txt, temp, desc.capitalize(), rain, snow, wind_speed, gust, wind_deg, pressure, cloud_cover, humidity])
+            weather_list.append([dt_txt, temp, desc, rain, snow, wind_speed, gust, wind_deg, pressure, cloud_cover, humidity])
 
-        # Create a DataFrame from the weather data
-        df_weather = pd.DataFrame(weather_list, columns=["Date/Time", "Temperature (°C)", "Description", "Rain (mm)", "Snow (mm)", "Wind Speed (m/s)", "Wind Gust (m/s)", "Wind Direction (°)", "Pressure (hPa)", "Cloud Cover (%)", "Humidity (%)"])
+        # Create DataFrame
+        df_weather = pd.DataFrame(
+            weather_list,
+            columns=[
+                "Date/Time", "Temperature (°C)", "Description", "Rain (mm)", "Snow (mm)",
+                "Wind Speed (m/s)", "Wind Gust (m/s)", "Wind Direction (°)",
+                "Pressure (hPa)", "Cloud Cover (%)", "Humidity (%)"
+            ]
+        )
 
         if mode == "Show Weather Data 📊":
-            # Show weather data for 5 days (3-hour intervals)
             st.dataframe(df_weather)
 
         elif mode == "Show Weather Graph 📈":
-            # Initialize the graph
-            fig = go.Figure()
+            if df_weather.empty:
+                st.error("⚠️ No data available for graph.")
+            else:
+                fig = go.Figure()
 
-            # Plot temperature
-            fig.add_trace(
-                go.Scatter(
-                    x=df_weather["Date/Time"],
-                    y=df_weather["Temperature (°C)"],
-                    name="Temperature (°C) 🌡️",
-                    mode="lines+markers",
-                    line=dict(color="red")
+                # Plot temperature
+                fig.add_trace(
+                    go.Scatter(
+                        x=df_weather["Date/Time"],
+                        y=df_weather["Temperature (°C)"],
+                        name="Temperature (°C) 🌡️",
+                        mode="lines+markers",
+                        line=dict(color="red")
+                    )
                 )
-            )
 
-            # Plot humidity after temperature
-            fig.add_trace(
-                go.Scatter(
-                    x=df_weather["Date/Time"],
-                    y=df_weather["Humidity (%)"],
-                    name="Humidity (%) 💧",
-                    mode="lines+markers",
-                    line=dict(color="green"),
-                    yaxis="y2"  # Humidity uses secondary Y-axis
+                # Plot humidity
+                fig.add_trace(
+                    go.Scatter(
+                        x=df_weather["Date/Time"],
+                        y=df_weather["Humidity (%)"],
+                        name="Humidity (%) 💧",
+                        mode="lines+markers",
+                        line=dict(color="green"),
+                        yaxis="y2"
+                    )
                 )
-            )
 
-            # Plot rain
-            fig.add_trace(
-                go.Scatter(
-                    x=df_weather["Date/Time"],
-                    y=df_weather["Rain (mm)"],  # Can plot other variables like rain/snow if needed
-                    name="Rain (mm) 🌧️",
-                    mode="lines+markers",
-                    line=dict(color="blue"),
-                    yaxis="y3"
+                # Plot rain
+                fig.add_trace(
+                    go.Scatter(
+                        x=df_weather["Date/Time"],
+                        y=df_weather["Rain (mm)"],
+                        name="Rain (mm) 🌧️",
+                        mode="lines+markers",
+                        line=dict(color="blue"),
+                        yaxis="y3"
+                    )
                 )
-            )
 
-            # Update layout for dual axes
-            fig.update_layout(
-                yaxis=dict(
-                    title="Temperature (°C) 🌡️",
-                    titlefont=dict(color="red"),
-                    tickfont=dict(color="red")
-                ),
-                yaxis2=dict(
-                    title="Humidity (%) 💧",
-                    titlefont=dict(color="green"),
-                    tickfont=dict(color="green"),
-                    overlaying="y",
-                    side="right",
-                    position=0.85  # Adjust position to avoid overlap
-                ),
-                yaxis3=dict(
-                    title="Rain (mm) 🌧️",
-                    titlefont=dict(color="blue"),
-                    tickfont=dict(color="blue"),
-                    overlaying="y",
-                    side="right"
-                ),
-                title="Weather Forecast 📅",
-                xaxis=dict(title="Date & Time 🕒"),
-                xaxis_tickangle=-45,  # Rotate x-axis labels
-                title_x=0.5
-            )
+                # Update layout
+                fig.update_layout(
+                    title="Weather Forecast 📅",
+                    xaxis=dict(title="Date & Time 🕒", tickangle=-45),
+                    yaxis=dict(
+                        title="Temperature (°C) 🌡️",
+                        titlefont=dict(color="red"),
+                        tickfont=dict(color="red")
+                    ),
+                    yaxis2=dict(
+                        title="Humidity (%) 💧",
+                        titlefont=dict(color="green"),
+                        tickfont=dict(color="green"),
+                        overlaying="y",
+                        side="right"
+                    ),
+                    yaxis3=dict(
+                        title="Rain (mm) 🌧️",
+                        titlefont=dict(color="blue"),
+                        tickfont=dict(color="blue"),
+                        overlaying="y",
+                        side="right"
+                    ),
+                    title_x=0.5
+                )
 
-            # Display the graph
-            st.plotly_chart(fig)
+                st.plotly_chart(fig)
 
         elif mode == "Interactive Map 🌍":
-            # Display the interactive weather map
             st.write("**Interactive Weather Map 🌎**")
             st.markdown(
                 """
                 <iframe src="https://openweathermap.org/weathermap?basemap=map&cities=false&layer=temperature&lat=19.4342&lon=72.7718&zoom=5"
                 width="100%" height="600" style="border: none;"></iframe>
                 """,
-                unsafe_allow_html=True,
+                unsafe_allow_html=True
             )
+    else:
+        st.error("⚠️ Could not fetch weather data. Please check the city name or API key.")
+
 elif page == "Wind Rose Chart":
     st.subheader("🌀 Wind Rose Chart")
     st.write("Visualizing wind speeds and directions.")

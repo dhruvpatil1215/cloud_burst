@@ -312,7 +312,7 @@ elif mode == "Show Weather Graph 📈":
         # Display the graph
         st.plotly_chart(fig)
 
-        elif mode == "Interactive Map 🌍":
+elif mode == "Interactive Map 🌍":
             st.write("**Interactive Weather Map 🌎**")
             st.markdown(
                 """

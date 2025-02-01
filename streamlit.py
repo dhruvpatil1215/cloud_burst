@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 import seaborn as sns
+from plotly.subplots import make_subplots
+import plotly.graph_objects as go
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.impute import SimpleImputer
 from sklearn.model_selection import train_test_split
@@ -239,74 +241,76 @@ elif page == "5-Day Weather Data":
         if mode == "Show Weather Data 📊":
             st.dataframe(df_weather)
 
-        elif mode == "Show Weather Graph 📈":
-            if df_weather.empty:
-                st.error("⚠️ No data available for graph.")
-            else:
-                fig = go.Figure()
+elif mode == "Show Weather Graph 📈":
+    if df_weather.empty:
+        st.error("⚠️ No data available for graph.")
+    else:
+        # Create a subplot with secondary y-axes
+        fig = make_subplots(specs=[[{"secondary_y": True}]])
+        
+        # Plot temperature on primary y-axis
+        fig.add_trace(
+            go.Scatter(
+                x=df_weather["Date/Time"],
+                y=df_weather["Temperature (°C)"],
+                name="Temperature (°C) 🌡️",
+                mode="lines+markers",
+                line=dict(color="red")
+            ),
+            secondary_y=False  # Use primary y-axis
+        )
 
-                # Plot temperature
-                fig.add_trace(
-                    go.Scatter(
-                        x=df_weather["Date/Time"],
-                        y=df_weather["Temperature (°C)"],
-                        name="Temperature (°C) 🌡️",
-                        mode="lines+markers",
-                        line=dict(color="red")
-                    )
-                )
+        # Plot humidity on secondary y-axis
+        fig.add_trace(
+            go.Scatter(
+                x=df_weather["Date/Time"],
+                y=df_weather["Humidity (%)"],
+                name="Humidity (%) 💧",
+                mode="lines+markers",
+                line=dict(color="green")
+            ),
+            secondary_y=True  # Use secondary y-axis
+        )
 
-                # Plot humidity
-                fig.add_trace(
-                    go.Scatter(
-                        x=df_weather["Date/Time"],
-                        y=df_weather["Humidity (%)"],
-                        name="Humidity (%) 💧",
-                        mode="lines+markers",
-                        line=dict(color="green"),
-                        yaxis="y2"
-                    )
-                )
+        # Plot rain on secondary y-axis
+        fig.add_trace(
+            go.Scatter(
+                x=df_weather["Date/Time"],
+                y=df_weather["Rain (mm)"],
+                name="Rain (mm) 🌧️",
+                mode="lines+markers",
+                line=dict(color="blue")
+            ),
+            secondary_y=True  # Use secondary y-axis
+        )
 
-                # Plot rain
-                fig.add_trace(
-                    go.Scatter(
-                        x=df_weather["Date/Time"],
-                        y=df_weather["Rain (mm)"],
-                        name="Rain (mm) 🌧️",
-                        mode="lines+markers",
-                        line=dict(color="blue"),
-                        yaxis="y3"
-                    )
-                )
+        # Update layout with correct axis settings
+        fig.update_layout(
+            title="Weather Forecast 📅",
+            xaxis=dict(
+                title="Date & Time 🕒",
+                tickangle=-45,
+                showgrid=True
+            ),
+            yaxis=dict(
+                title="Temperature (°C) 🌡️",
+                titlefont=dict(color="red"),
+                tickfont=dict(color="red")
+            ),
+            yaxis2=dict(
+                title="Humidity & Rain (%) 💧🌧️",
+                titlefont=dict(color="green"),
+                tickfont=dict(color="green"),
+                overlaying="y",
+                side="right",
+                position=0.85  # Adjust the position to avoid overlap
+            ),
+            legend=dict(x=0, y=1),
+            title_x=0.5
+        )
 
-                # Update layout
-                fig.update_layout(
-                    title="Weather Forecast 📅",
-                    xaxis=dict(title="Date & Time 🕒", tickangle=-45),
-                    yaxis=dict(
-                        title="Temperature (°C) 🌡️",
-                        titlefont=dict(color="red"),
-                        tickfont=dict(color="red")
-                    ),
-                    yaxis2=dict(
-                        title="Humidity (%) 💧",
-                        titlefont=dict(color="green"),
-                        tickfont=dict(color="green"),
-                        overlaying="y",
-                        side="right"
-                    ),
-                    yaxis3=dict(
-                        title="Rain (mm) 🌧️",
-                        titlefont=dict(color="blue"),
-                        tickfont=dict(color="blue"),
-                        overlaying="y",
-                        side="right"
-                    ),
-                    title_x=0.5
-                )
-
-                st.plotly_chart(fig)
+        # Display the graph
+        st.plotly_chart(fig)
 
         elif mode == "Interactive Map 🌍":
             st.write("**Interactive Weather Map 🌎**")

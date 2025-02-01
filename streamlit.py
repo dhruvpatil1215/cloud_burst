@@ -236,74 +236,38 @@ elif page == "5-Day Weather Data":
             st.dataframe(df_weather)
 
         elif mode == "Show Weather Graph 📈":
-            # Initialize the graph
-            fig = go.Figure()
+    # Initialize the graph
+    fig = go.Figure()
 
-            # Plot temperature
-            fig.add_trace(
-                go.Scatter(
-                    x=df_weather["Date/Time"],
-                    y=df_weather["Temperature (°C)"],
-                    name="Temperature (°C) 🌡️",
-                    mode="lines+markers",
-                    line=dict(color="red")
-                )
-            )
+    # Plot temperature
+    fig.add_trace(go.Scatter(x=df_weather["Date/Time"], y=df_weather["Temperature (°C)"], 
+                             mode='lines', name="Temperature (°C)", line=dict(color='red')))
 
-            # Plot humidity after temperature
-            fig.add_trace(
-                go.Scatter(
-                    x=df_weather["Date/Time"],
-                    y=df_weather["Humidity (%)"],
-                    name="Humidity (%) 💧",
-                    mode="lines+markers",
-                    line=dict(color="green"),
-                    yaxis="y2"  # Humidity uses secondary Y-axis
-                )
-            )
+    # Plot humidity
+    fig.add_trace(go.Scatter(x=df_weather["Date/Time"], y=df_weather["Humidity (%)"], 
+                             mode='lines', name="Humidity (%)", line=dict(color='blue')))
 
-            # Plot rain
-            fig.add_trace(
-                go.Scatter(
-                    x=df_weather["Date/Time"],
-                    y=df_weather["Rain (mm)"],  # Can plot other variables like rain/snow if needed
-                    name="Rain (mm) 🌧️",
-                    mode="lines+markers",
-                    line=dict(color="blue"),
-                    yaxis="y3"
-                )
-            )
+    # Plot wind speed
+    fig.add_trace(go.Scatter(x=df_weather["Date/Time"], y=df_weather["Wind Speed (m/s)"], 
+                             mode='lines', name="Wind Speed (m/s)", line=dict(color='green')))
 
-            # Update layout for dual axes
-            fig.update_layout(
-                yaxis=dict(
-                    title="Temperature (°C) 🌡️",
-                    titlefont=dict(color="red"),
-                    tickfont=dict(color="red")
-                ),
-                yaxis2=dict(
-                    title="Humidity (%) 💧",
-                    titlefont=dict(color="green"),
-                    tickfont=dict(color="green"),
-                    overlaying="y",
-                    side="right",
-                    position=0.85  # Adjust position to avoid overlap
-                ),
-                yaxis3=dict(
-                    title="Rain (mm) 🌧️",
-                    titlefont=dict(color="blue"),
-                    tickfont=dict(color="blue"),
-                    overlaying="y",
-                    side="right"
-                ),
-                title="Weather Forecast 📅",
-                xaxis=dict(title="Date & Time 🕒"),
-                xaxis_tickangle=-45,  # Rotate x-axis labels
-                title_x=0.5
-            )
+    # Customize layout
+    fig.update_layout(
+        title="Weather Data Over the Next 5 Days",
+        xaxis_title="Date/Time",
+        yaxis_title="Values",
+        legend_title="Weather Variables",
+        template="plotly_dark",
+        plot_bgcolor='rgb(17, 17, 17)',  # Dark background for better contrast
+        paper_bgcolor='rgb(17, 17, 17)',  # Dark background for paper too
+        xaxis=dict(tickmode='linear', tick0=0, dtick=1),
+        yaxis=dict(title="Values"),
+        height=600
+    )
 
-            # Display the graph
-            st.plotly_chart(fig)
+    # Show the graph
+    st.plotly_chart(fig)
+
 
         elif mode == "Interactive Map 🌍":
             # Display the interactive weather map

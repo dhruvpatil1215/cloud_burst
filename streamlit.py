@@ -240,8 +240,8 @@ elif page == "5-Day Weather Data":
             # Show weather data for 5 days (3-hour intervals)
             st.dataframe(df_weather)
 
-        elif mode == "Show Weather Graph 📈":
-            try:
+       elif mode == "Show Weather Graph 📈":
+    try:
         # Initialize the graph
         fig = go.Figure()
 

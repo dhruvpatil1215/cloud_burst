@@ -236,6 +236,10 @@ elif page == "5-Day Weather Data":
             st.dataframe(df_weather)
 
         elif mode == "Show Weather Graph 📈":
+    import plotly.graph_objects as go
+    from plotly.subplots import make_subplots
+    import streamlit as st
+
     # Initialize the figure with a secondary y-axis
     fig = make_subplots(specs=[[{"secondary_y": True}]])
 
@@ -296,6 +300,7 @@ elif page == "5-Day Weather Data":
 
     # Display the graph
     st.plotly_chart(fig)
+
 
         elif mode == "Interactive Map 🌍":
             # Display the interactive weather map

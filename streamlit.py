@@ -12,8 +12,6 @@ import plotly.express as px
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.svm import SVC
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 import requests
 
 # Streamlit page configuration
@@ -238,67 +236,86 @@ elif page == "5-Day Weather Data":
             st.dataframe(df_weather)
 
         elif mode == "Show Weather Graph 📈":
+            # Initialize the graph
+            fig = go.Figure()
 
-    # Initialize the figure with a secondary y-axis
-            fig = make_subplots(specs=[[{"secondary_y": True}]])
-
-    # Plot temperature (Primary Y-axis)
+            # Plot temperature
             fig.add_trace(
                 go.Scatter(
-                x=df_weather["Date/Time"],
-                y=df_weather["Temperature (°C)"],
-                name="Temperature (°C) 🌡️",
-                mode="lines+markers",
-                line=dict(color="red")
-            ),
-            secondary_y=False  # Uses the primary y-axis
-        )
+                    x=df_weather["Date/Time"],
+                    y=df_weather["Temperature (°C)"],
+                    name="Temperature (°C) 🌡️",
+                    mode="lines+markers",
+                    line=dict(color="red")
+                )
+            )
 
-    # Plot humidity (Secondary Y-axis)
-        fig.add_trace(
-            go.Scatter(
-                x=df_weather["Date/Time"],
-                y=df_weather["Humidity (%)"],
-                name="Humidity (%) 💧",
-                mode="lines+markers",
-                line=dict(color="green")
-            ),
-            secondary_y=True  # Uses the secondary y-axis
-        )
+            # Plot humidity after temperature
+            fig.add_trace(
+                go.Scatter(
+                    x=df_weather["Date/Time"],
+                    y=df_weather["Humidity (%)"],
+                    name="Humidity (%) 💧",
+                    mode="lines+markers",
+                    line=dict(color="green"),
+                    yaxis="y2"  # Humidity uses secondary Y-axis
+                )
+            )
 
-    # Plot rain (Also on Secondary Y-axis)
-        fig.add_trace(
-            go.Scatter(
-                x=df_weather["Date/Time"],
-                y=df_weather["Rain (mm)"],
-                name="Rain (mm) 🌧️",
-                mode="lines+markers",
-                line=dict(color="blue")
-            ),
-            secondary_y=True  # Uses the secondary y-axis
-        )
+            # Plot rain
+            fig.add_trace(
+                go.Scatter(
+                    x=df_weather["Date/Time"],
+                    y=df_weather["Rain (mm)"],  # Can plot other variables like rain/snow if needed
+                    name="Rain (mm) 🌧️",
+                    mode="lines+markers",
+                    line=dict(color="blue"),
+                    yaxis="y3"
+                )
+            )
 
-    # Update layout for dual y-axes
-        fig.update_layout(
-            title="Weather Forecast 📅",
-            xaxis=dict(title="Date & Time 🕒", tickangle=-45),
-            yaxis=dict(
-                title="Temperature (°C) 🌡️",
-                titlefont=dict(color="red"),
-                tickfont=dict(color="red"),
-            ),
-            yaxis2=dict(
-                title="Humidity (%) & Rain (mm) 💧🌧️",
-                titlefont=dict(color="green"),
-                tickfont=dict(color="green"),
-                overlaying="y",
-                side="right",
-            ),
-            title_x=0.5
-        )
+            # Update layout for dual axes
+            fig.update_layout(
+                yaxis=dict(
+                    title="Temperature (°C) 🌡️",
+                    titlefont=dict(color="red"),
+                    tickfont=dict(color="red")
+                ),
+                yaxis2=dict(
+                    title="Humidity (%) 💧",
+                    titlefont=dict(color="green"),
+                    tickfont=dict(color="green"),
+                    overlaying="y",
+                    side="right",
+                    position=0.85  # Adjust position to avoid overlap
+                ),
+                yaxis3=dict(
+                    title="Rain (mm) 🌧️",
+                    titlefont=dict(color="blue"),
+                    tickfont=dict(color="blue"),
+                    overlaying="y",
+                    side="right"
+                ),
+                title="Weather Forecast 📅",
+                xaxis=dict(title="Date & Time 🕒"),
+                xaxis_tickangle=-45,  # Rotate x-axis labels
+                title_x=0.5
+            )
+            
 
-    # Display the graph
-        st.plotly_chart(fig)
+            # Display the graph
+            st.plotly_chart(fig)
+
+        elif mode == "Interactive Map 🌍":
+            # Display the interactive weather map
+            st.write("**Interactive Weather Map 🌎**")
+            st.markdown(
+                """
+                <iframe src="https://openweathermap.org/weathermap?basemap=map&cities=false&layer=temperature&lat=19.4342&lon=72.7718&zoom=5"
+                width="100%" height="600" style="border: none;"></iframe>
+                """,
+                unsafe_allow_html=True,
+            )
 elif page == "Wind Rose Chart":
     st.subheader("🌀 Wind Rose Chart")
     st.write("Visualizing wind speeds and directions.")
@@ -458,6 +475,8 @@ elif page == "Dual-Axis Chart":
 
         # Display the chart
         st.plotly_chart(fig_dualaxis)
+
+
 
 elif page == "Model Comparison":
     st.subheader("⚖ Model Comparison")

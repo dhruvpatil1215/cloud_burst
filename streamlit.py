@@ -241,74 +241,80 @@ elif page == "5-Day Weather Data":
             st.dataframe(df_weather)
 
         elif mode == "Show Weather Graph 📈":
-            # Initialize the graph
-            fig = go.Figure()
+    try:
+        # Initialize the graph
+        fig = go.Figure()
 
-            # Plot temperature
-            fig.add_trace(
-                go.Scatter(
-                    x=df_weather["Date/Time"],
-                    y=df_weather["Temperature (°C)"],
-                    name="Temperature (°C) 🌡️",
-                    mode="lines+markers",
-                    line=dict(color="red")
-                )
+        # Plot temperature
+        fig.add_trace(
+            go.Scatter(
+                x=df_weather["Date/Time"],
+                y=df_weather["Temperature (°C)"],
+                name="Temperature (°C) 🌡️",
+                mode="lines+markers",
+                line=dict(color="red")
             )
+        )
 
-            # Plot humidity on a secondary Y-axis
-            fig.add_trace(
-                go.Scatter(
-                    x=df_weather["Date/Time"],
-                    y=df_weather["Humidity (%)"],
-                    name="Humidity (%) 💧",
-                    mode="lines+markers",
-                    line=dict(color="green"),
-                    yaxis="y2"  # Humidity uses secondary Y-axis
-                )
+        # Plot humidity on a secondary Y-axis
+        fig.add_trace(
+            go.Scatter(
+                x=df_weather["Date/Time"],
+                y=df_weather["Humidity (%)"],
+                name="Humidity (%) 💧",
+                mode="lines+markers",
+                line=dict(color="green"),
+                yaxis="y2"  # Humidity uses secondary Y-axis
             )
+        )
 
-            # Plot rain (separate Y-axis on the right)
-            fig.add_trace(
-                go.Bar(
-                    x=df_weather["Date/Time"],
-                    y=df_weather["Rain (mm)"],
-                    name="Rain (mm) 🌧️",
-                    marker=dict(color="blue"),
-                    yaxis="y3"
-                )
+        # Plot rain (separate Y-axis on the right)
+        fig.add_trace(
+            go.Bar(
+                x=df_weather["Date/Time"],
+                y=df_weather["Rain (mm)"],
+                name="Rain (mm) 🌧️",
+                marker=dict(color="blue"),
+                yaxis="y3"
             )
+        )
 
-            # Fix: Properly configure multiple Y-axes
-            fig.update_layout(
-                title="Weather Forecast 📅",
-                xaxis=dict(title="Date & Time 🕒", tickangle=-45),  # Rotate x-axis labels
-                yaxis=dict(
-                    title="Temperature (°C) 🌡️",
-                    titlefont=dict(color="red"),
-                    tickfont=dict(color="red"),
-                ),
-                yaxis2=dict(
-                    title="Humidity (%) 💧",
-                    titlefont=dict(color="green"),
-                    tickfont=dict(color="green"),
-                    overlaying="y",
-                    side="right"
-                ),
-                yaxis3=dict(
-                    title="Rain (mm) 🌧️",
-                    titlefont=dict(color="blue"),
-                    tickfont=dict(color="blue"),
-                    overlaying="y",
-                    side="right",
-                    showgrid=False  # Fix: Remove grid overlap
-                ),
-                barmode="group",  # Fix: Prevent bar stacking issue
-                legend=dict(x=0, y=1.1, orientation="h"),
-                template="plotly_white"
-            )
+        # Update layout with multiple y-axes
+        fig.update_layout(
+            title="Weather Forecast 📅",
+            xaxis=dict(title="Date & Time 🕒", tickangle=-45),  # Rotate x-axis labels
+            yaxis=dict(
+                title="Temperature (°C) 🌡️",
+                titlefont=dict(color="red"),
+                tickfont=dict(color="red"),
+            ),
+            yaxis2=dict(
+                title="Humidity (%) 💧",
+                titlefont=dict(color="green"),
+                tickfont=dict(color="green"),
+                overlaying="y",  # Overlay the primary y-axis
+                side="right"
+            ),
+            yaxis3=dict(
+                title="Rain (mm) 🌧️",
+                titlefont=dict(color="blue"),
+                tickfont=dict(color="blue"),
+                overlaying="y",  # Overlay the primary y-axis
+                side="right",
+                showgrid=False  # Remove grid overlap
+            ),
+            barmode="group",  # Prevent bar stacking issue
+            legend=dict(x=0, y=1.1, orientation="h"),
+            template="plotly_white"
+        )
 
-            # Display the graph
-            st.plotly_chart(fig)
+        # Display the graph
+        st.plotly_chart(fig)
+
+    except Exception as e:
+        st.error(f"An error occurred while creating the weather graph: {e}")
+        st.write("Ensure your data is correctly formatted and contains valid values.")
+
 
 elif page == "Wind Rose Chart":
     st.subheader("🌀 Wind Rose Chart")

@@ -297,18 +297,6 @@ elif page == "5-Day Weather Data":
 
     # Display the graph
         st.plotly_chart(fig)
-
-
-        elif mode == "Interactive Map 🌍":
-            # Display the interactive weather map
-            st.write("**Interactive Weather Map 🌎**")
-            st.markdown(
-                """
-                <iframe src="https://openweathermap.org/weathermap?basemap=map&cities=false&layer=temperature&lat=19.4342&lon=72.7718&zoom=5"
-                width="100%" height="600" style="border: none;"></iframe>
-                """,
-                unsafe_allow_html=True,
-            )
 elif page == "Wind Rose Chart":
     st.subheader("🌀 Wind Rose Chart")
     st.write("Visualizing wind speeds and directions.")

@@ -229,7 +229,11 @@ elif page == "5-Day Weather Data":
             weather_list.append([dt_txt, temp, desc.capitalize(), rain, snow, wind_speed, gust, wind_deg, pressure, cloud_cover, humidity])
 
         # Create a DataFrame from the weather data
-        df_weather = pd.DataFrame(weather_list, columns=["Date/Time", "Temperature (°C)", "Description", "Rain (mm)", "Snow (mm)", "Wind Speed (m/s)", "Wind Gust (m/s)", "Wind Direction (°)", "Pressure (hPa)", "Cloud Cover (%)", "Humidity (%)"])
+        df_weather = pd.DataFrame(weather_list, columns=[
+            "Date/Time", "Temperature (°C)", "Description", "Rain (mm)", "Snow (mm)", 
+            "Wind Speed (m/s)", "Wind Gust (m/s)", "Wind Direction (°)", 
+            "Pressure (hPa)", "Cloud Cover (%)", "Humidity (%)"
+        ])
 
         if mode == "Show Weather Data 📊":
             # Show weather data for 5 days (3-hour intervals)
@@ -250,7 +254,7 @@ elif page == "5-Day Weather Data":
                 )
             )
 
-            # Plot humidity after temperature
+            # Plot humidity on a secondary Y-axis
             fig.add_trace(
                 go.Scatter(
                     x=df_weather["Date/Time"],
@@ -262,48 +266,48 @@ elif page == "5-Day Weather Data":
                 )
             )
 
-            # Plot rain
+            # Plot rain on a third Y-axis
             fig.add_trace(
-                go.Scatter(
+                go.Bar(
                     x=df_weather["Date/Time"],
-                    y=df_weather["Rain (mm)"],  # Can plot other variables like rain/snow if needed
+                    y=df_weather["Rain (mm)"],
                     name="Rain (mm) 🌧️",
-                    mode="lines+markers",
-                    line=dict(color="blue"),
+                    marker=dict(color="blue"),
                     yaxis="y3"
                 )
             )
 
-            # Update layout for dual axes
+            # Update layout for multiple Y-axes
             fig.update_layout(
+                title="Weather Forecast 📅",
+                xaxis=dict(title="Date & Time 🕒", tickangle=-45),  # Rotate x-axis labels
                 yaxis=dict(
                     title="Temperature (°C) 🌡️",
                     titlefont=dict(color="red"),
-                    tickfont=dict(color="red")
+                    tickfont=dict(color="red"),
                 ),
                 yaxis2=dict(
                     title="Humidity (%) 💧",
                     titlefont=dict(color="green"),
                     tickfont=dict(color="green"),
                     overlaying="y",
-                    side="right",
-                    position=0.85  # Adjust position to avoid overlap
+                    side="right"
                 ),
                 yaxis3=dict(
                     title="Rain (mm) 🌧️",
                     titlefont=dict(color="blue"),
                     tickfont=dict(color="blue"),
                     overlaying="y",
-                    side="right"
+                    side="right",
+                    anchor="x"
                 ),
-                title="Weather Forecast 📅",
-                xaxis=dict(title="Date & Time 🕒"),
-                xaxis_tickangle=-45,  # Rotate x-axis labels
-                title_x=0.5
+                legend=dict(x=0, y=1.1, orientation="h"),
+                template="plotly_white"
             )
 
             # Display the graph
             st.plotly_chart(fig)
+
 
         elif mode == "Interactive Map 🌍":
             # Display the interactive weather map

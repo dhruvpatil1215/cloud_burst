@@ -12,6 +12,8 @@ import plotly.express as px
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.svm import SVC
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import requests
 
 # Streamlit page configuration

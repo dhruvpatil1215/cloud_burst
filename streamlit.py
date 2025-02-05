@@ -288,21 +288,7 @@ elif page == "5-Day Weather Data":
                     overlaying="y",
                     side="right",
                     position=0.85  # Adjust position to avoid overlap
-                ),
-                yaxis3=dict(
-                    title="Rain (mm) 🌧️",
-                    titlefont=dict(color="blue"),
-                    tickfont=dict(color="blue"),
-                    overlaying="y",
-                    side="right"
-                ),
-                title="Weather Forecast 📅",
-                xaxis=dict(title="Date & Time 🕒"),
-                xaxis_tickangle=-45,  # Rotate x-axis labels
-                title_x=0.5
-            )
-            
-
+                )
             # Display the graph
             st.plotly_chart(fig)
 

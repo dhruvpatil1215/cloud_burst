@@ -286,22 +286,21 @@ elif page == "5-Day Weather Data":
                     titlefont=dict(color="green"),
                     tickfont=dict(color="green"),
                     overlaying="y",
-                    side="right"
-                 ),
-                yaxis3=dict(  # Correctly define yaxis3
+                    side="right",
+                    position=0.85  # Adjust position to avoid overlap
+                ),
+                yaxis3=dict(
                     title="Rain (mm) 🌧️",
                     titlefont=dict(color="blue"),
                     tickfont=dict(color="blue"),
                     overlaying="y",
-                    side="right",
-                    anchor="free",
-                    position=1.05  # Move further to the right
+                    side="right"
                 ),
-                xaxis=dict(title="Date & Time 🕒", tickangle=-45),
                 title="Weather Forecast 📅",
+                xaxis=dict(title="Date & Time 🕒"),
+                xaxis_tickangle=-45,  # Rotate x-axis labels
                 title_x=0.5
             )
-
             
 
             # Display the graph

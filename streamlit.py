@@ -286,10 +286,24 @@ elif page == "5-Day Weather Data":
                     titlefont=dict(color="green"),
                     tickfont=dict(color="green"),
                     overlaying="y",
+                    side="right"
+                 ),
+                yaxis3=dict(  # Correctly define yaxis3
+                    title="Rain (mm) 🌧️",
+                    titlefont=dict(color="blue"),
+                    tickfont=dict(color="blue"),
+                    overlaying="y",
                     side="right",
-                    position=0.85  # Adjust position to avoid overlap
-                )
+                    anchor="free",
+                    position=1.05  # Move further to the right
+                ),
+                xaxis=dict(title="Date & Time 🕒", tickangle=-45),
+                title="Weather Forecast 📅",
+                title_x=0.5
             )
+
+            
+
             # Display the graph
             st.plotly_chart(fig)
 

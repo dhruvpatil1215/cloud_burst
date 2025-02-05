@@ -289,6 +289,7 @@ elif page == "5-Day Weather Data":
                     side="right",
                     position=0.85  # Adjust position to avoid overlap
                 )
+            )
             # Display the graph
             st.plotly_chart(fig)
 

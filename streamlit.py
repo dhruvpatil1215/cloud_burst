@@ -293,7 +293,7 @@ elif page == "5-Day Weather Data":
                     title="Rain (mm) 🌧️",
                     titlefont=dict(color="blue"),
                     tickfont=dict(color="blue"),
-                    overlaying="y",
+                    overlaying="y2",
                     side="right"
                 ),
                 title="Weather Forecast 📅",

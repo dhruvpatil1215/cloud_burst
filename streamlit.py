@@ -280,28 +280,29 @@ elif page == "5-Day Weather Data":
                     title="Temperature (°C) 🌡️",
                     titlefont=dict(color="red"),
                     tickfont=dict(color="red")
-                ),
+            ),
                 yaxis2=dict(
                     title="Humidity (%) 💧",
                     titlefont=dict(color="green"),
                     tickfont=dict(color="green"),
-                    overlaying="y",
+                    overlaying="y",  # This overlays y2 on the first y-axis
                     side="right",
                     position=0.85  # Adjust position to avoid overlap
-                ),
+                ),    
                 yaxis3=dict(
                     title="Rain (mm) 🌧️",
                     titlefont=dict(color="blue"),
                     tickfont=dict(color="blue"),
-                    overlaying="y2",
+                    overlaying="y2",  # This overlays y3 on y2
                     side="right",
-                    position=1.0 
+                    position=0.95  # Adjusted to avoid conflict with yaxis2
                 ),
                 title="Weather Forecast 📅",
                 xaxis=dict(title="Date & Time 🕒"),
                 xaxis_tickangle=-45,  # Rotate x-axis labels
                 title_x=0.5
             )
+
             
 
             # Display the graph

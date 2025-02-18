@@ -295,6 +295,7 @@ elif page == "5-Day Weather Data":
                     tickfont=dict(color="blue"),
                     overlaying="y2",
                     side="right"
+                    position=1.0 
                 ),
                 title="Weather Forecast 📅",
                 xaxis=dict(title="Date & Time 🕒"),

@@ -13,9 +13,35 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.svm import SVC
 import requests
+from twilio.rest import Client
+import streamlit as st
+
 
 # Streamlit page configuration
 st.set_page_config(page_title="Cloudburst Prediction", page_icon="⛅", layout="wide")
+col1, col2 = st.columns([8, 2])  # Create space for title and login button
+
+with col2:
+    if st.button("🔑 Login"):
+        st.info("Login functionality coming soon!")
+# Twilio Credentials (Replace with your actual credentials)
+TWILIO_ACCOUNT_SID = "" 
+TWILIO_AUTH_TOKEN = ""
+TWILIO_WHATSAPP_NUMBER = ""  # Twilio Sandbox Number
+RECEIVER_WHATSAPP_NUMBERS = [
+    "whatsapp:",
+    "whatsapp:",
+    "whatsapp:"
+]
+def send_whatsapp_alert(probability):
+    client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+    message = client.messages.create(
+        from_=TWILIO_WHATSAPP_NUMBER,
+        body=f"🚨 Alert! Cloudburst probability is {probability:.2%}. Take precautions! 🌧",
+        to=RECEIVER_WHATSAPP_NUMBERS
+    )
+    return message.sid  # Return message ID if successful
+
 
 # Custom dark theme styling
 st.markdown("""
@@ -175,6 +201,9 @@ def predict_cloudburst_probability(input_data):
 
 user_input_imputed = imputer.transform(pd.DataFrame([st.session_state.user_input_dict]))
 probability_result = predict_cloudburst_probability(user_input_imputed)
+if probability_result > 0.60:  # 60% threshold
+    st.warning("⚠ Cloudburst Probability is above 60%! Sending WhatsApp Alert...")
+    send_whatsapp_alert(probability_result)  # Call Twilio function
 
 # Page content handling
 if page == "Home":
@@ -205,7 +234,7 @@ elif page == "5-Day Weather Data":
     )
 
     if weather_data:
-        st.write(f"**City:** {weather_data['city']['name']} 🌆, {weather_data['city']['country']} 🌍")
+        st.write(f"*City:* {weather_data['city']['name']} 🌆, {weather_data['city']['country']} 🌍")
         forecasts = weather_data['list']
 
         # Create an empty list to store weather data for the next 5 days (3-hour intervals)
@@ -234,6 +263,9 @@ elif page == "5-Day Weather Data":
         if mode == "Show Weather Data 📊":
             # Show weather data for 5 days (3-hour intervals)
             st.dataframe(df_weather)
+            csv = df_weather.to_csv(index=False).encode('utf-8')
+            st.download_button("Download Weather Data as CSV", csv, "weather_data.csv", "text/csv")
+
 
         elif mode == "Show Weather Graph 📈":
             # Initialize the graph
@@ -244,7 +276,7 @@ elif page == "5-Day Weather Data":
                 go.Scatter(
                     x=df_weather["Date/Time"],
                     y=df_weather["Temperature (°C)"],
-                    name="Temperature (°C) 🌡️",
+                    name="Temperature (°C) 🌡",
                     mode="lines+markers",
                     line=dict(color="red")
                 )
@@ -267,7 +299,7 @@ elif page == "5-Day Weather Data":
                 go.Scatter(
                     x=df_weather["Date/Time"],
                     y=df_weather["Rain (mm)"],  # Can plot other variables like rain/snow if needed
-                    name="Rain (mm) 🌧️",
+                    name="Rain (mm) 🌧",
                     mode="lines+markers",
                     line=dict(color="blue"),
                     yaxis="y3"
@@ -277,32 +309,30 @@ elif page == "5-Day Weather Data":
             # Update layout for dual axes
             fig.update_layout(
                 yaxis=dict(
-                    title="Temperature (°C) 🌡️",
+                    title="Temperature (°C) 🌡",
                     titlefont=dict(color="red"),
                     tickfont=dict(color="red")
-            ),
+                ),
                 yaxis2=dict(
                     title="Humidity (%) 💧",
                     titlefont=dict(color="green"),
                     tickfont=dict(color="green"),
-                    overlaying="y",  # This overlays y2 on the first y-axis
+                    overlaying="y",
                     side="right",
                     position=0.85  # Adjust position to avoid overlap
-                ),    
+                ),
                 yaxis3=dict(
-                    title="Rain (mm) 🌧️",
+                    title="Rain (mm) 🌧",
                     titlefont=dict(color="blue"),
                     tickfont=dict(color="blue"),
-                    overlaying="y2",  # This overlays y3 on y2
-                    side="right",
-                    position=0.95  # Adjusted to avoid conflict with yaxis2
+                    overlaying="y",
+                    side="right"
                 ),
                 title="Weather Forecast 📅",
                 xaxis=dict(title="Date & Time 🕒"),
                 xaxis_tickangle=-45,  # Rotate x-axis labels
                 title_x=0.5
             )
-
             
 
             # Display the graph
@@ -310,7 +340,7 @@ elif page == "5-Day Weather Data":
 
         elif mode == "Interactive Map 🌍":
             # Display the interactive weather map
-            st.write("**Interactive Weather Map 🌎**")
+            st.write("*Interactive Weather Map 🌎*")
             st.markdown(
                 """
                 <iframe src="https://openweathermap.org/weathermap?basemap=map&cities=false&layer=temperature&lat=19.4342&lon=72.7718&zoom=5"
@@ -322,7 +352,7 @@ elif page == "Wind Rose Chart":
     st.subheader("🌀 Wind Rose Chart")
     st.write("Visualizing wind speeds and directions.")
     st.write("The Wind Rose Chart displays the distribution of wind speeds and directions.🌀")
-    st.write("The length of each bar represents the wind speed 🌬️, and the direction is indicated by the angle. ↗️")
+    st.write("The length of each bar represents the wind speed 🌬, and the direction is indicated by the angle. ↗")
     st.write("This chart helps visualize the predominant wind patterns in the dataset. 🌍")
 
     wind_directions = np.random.uniform(0, 360, len(data['WindGustSpeed']))
@@ -344,7 +374,7 @@ elif page == "Wind Rose Chart":
 
 elif page == "Model Analysis":
     st.subheader("📊 Model Performance")
-    st.write(f"*Model Accuracy:* {accuracy:.2%}")
+    st.write(f"Model Accuracy: {accuracy:.2%}")
 
     st.subheader("📉 Confusion Matrix")
     # Create a figure explicitly
@@ -386,7 +416,7 @@ elif page == "Distribution Plots":
     # Distribution Plots page content
     st.subheader("Distribution Plots:")
     for feature in features:
-        st.write(f"**{feature} Distribution:**")
+        st.write(f"{feature} Distribution:")
         st.write(f"The Distribution Plot shows the distribution of {feature} in the dataset.")
         st.write("It provides insights into the spread and density of each feature.")
 
